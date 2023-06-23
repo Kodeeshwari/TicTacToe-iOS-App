@@ -27,7 +27,6 @@ class PlayerModel{
         var columnCount = 0
         var diagCount = 0
         var revDiagCount = 0
-        var player = ""
         for m in 0..<boardArray.count-1
         {
             for n in 0..<boardArray[m].count-1{
@@ -44,6 +43,13 @@ class PlayerModel{
                     diagCount+=1
                 }
             }
+            
+            for x in stride(from: boardArray.count-1, through: 1, by: -1) {
+                if((boardArray[m][x] == boardArray[m+1][x-1]) &&
+                   (m+x == boardArray.count-1)){
+                    revDiagCount+=1
+                }
+            }
             if(rowCount == boardArray.count-1){
                 return true
             }
@@ -53,21 +59,11 @@ class PlayerModel{
             if(diagCount == boardArray.count-1){
                 return true
             }
-            rowCount = 0
-            columnCount = 0
-        }
-        
-        for i in 0..<boardArray.count-1
-        {
-            for x in stride(from: boardArray.count-1, through: 1, by: -1) {
-                if((boardArray[i][x] == boardArray[i+1][x-1]) &&
-                   (i+x == boardArray.count-1)){
-                    revDiagCount+=1
-                }
-            }
             if(revDiagCount == boardArray.count-1){
                 return true
             }
+            rowCount = 0
+            columnCount = 0
         }
         return false
     }

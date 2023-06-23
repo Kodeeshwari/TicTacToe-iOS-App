@@ -15,52 +15,73 @@ class ViewController: UIViewController {
     
     var player = PlayerModel()
     var cellClicked = 0
+    var playerSymbol : String = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
-        //boardCell.tintColor = UIColor(red: 12.0/255.0, green: 16.0/255.0, blue: 23/255.0, alpha: 0.6)
-        //boardCell.backgroundColor = UIColor.cyan
     }
     
     @IBAction func playerMoveBtnTouchupInside(_ sender: UIButton) {
-      
-        let playerSymbol = player.SwitchPlayer()
-        lblTitle.text = "Player \(playerSymbol) Turn"
-        sender.isEnabled = false
-        sender.layer.borderColor = UIColor.blue.cgColor
-        sender.layer.borderWidth = 1.5
-        sender.layer.cornerRadius = 2
-        sender.setTitle(playerSymbol, for: .normal)
-        sender.setTitleColor(.white, for: .highlighted)
         
+        playerSymbol = player.SwitchPlayer()
+        lblTitle.text = "Player \(playerSymbol) played"
         
+        setupButtonStyle(sender, playerSymbol)
+        updateGameBoard(sender, playerSymbol)
+        
+        let win = player.checkWinCondition()
+        
+        if win {
+            handleWinCondition(playerSymbol)
+        } else {
+            cellClicked += 1
+            if cellClicked == 9 {
+                handleDrawCondition()
+            }
+        }
+    }
+    
+    func setupButtonStyle(_ button : UIButton, _ playerSymbol : String){
+        button.layer.borderWidth = 1.5
+        button.layer.cornerRadius = 2
+        button.setTitle(playerSymbol, for: .normal)
+        
+        let borderColor: UIColor
+        let textColor: UIColor
+        
+        if playerSymbol == "X" {
+            borderColor = .cyan
+            textColor = .cyan
+        } else {
+            borderColor = .orange
+            textColor = .orange
+        }
+        
+        button.layer.borderColor = borderColor.cgColor
+        button.setTitleColor(textColor, for: .normal)
+        button.setTitleColor(textColor, for: .disabled)
+        button.isEnabled = false
+    }
+    
+    func updateGameBoard(_ sender : UIButton, _ playerSymbol : String){
         let btnNumber = sender.tag
         let row = btnNumber / 3
         let column = btnNumber % 3
         
-      //  print("row = \(row)...Column = \(column)")
-        
         player.updateGameBoardArray(row: row, column: column, playerSymbol: playerSymbol)
-        
-        var win = player.checkWinCondition()
-        
-        if(win){
-            lblTitle.text = "Player \(playerSymbol) Won"
-            lblTitle.textColor = UIColor.blue
-            self.view.isUserInteractionEnabled = false
-        }
-        else{
-            cellClicked+=1
-        }
-        if(cellClicked==9){
-            lblTitle.text = "Draw"
-            lblTitle.textColor = UIColor.red
-           
-        }
-        
-
     }
     
+    func handleWinCondition(_ playerSymbol: String) {
+        lblTitle.text = "Player \(playerSymbol) Won"
+        let textColor: UIColor = (playerSymbol == "X") ? .cyan : .orange
+        lblTitle.textColor = textColor
+        self.view.isUserInteractionEnabled = false
+    }
+    
+    func handleDrawCondition() {
+        lblTitle.text = "Draw"
+        lblTitle.textColor = .red
+        self.view.isUserInteractionEnabled = false
+    }
 }
 
